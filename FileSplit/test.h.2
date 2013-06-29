@@ -1,0 +1,78 @@
+r());
+}
+
+#if _MSC_VER<1500
+	// disgusting macro hack to get a range checked string:
+	#define string String
+	// MS C++ 9.0 have a built-in assert for string range check
+	// and uses "std::string" in several places so that macro substitution fails
+#endif
+
+template<class T> char* as_bytes(T& i)	// needed for binary I/O
+{
+	void* addr = &i;	// get the address of the first byte
+						// of memory used to store the object
+	return static_cast<char*>(addr); // treat that memory as bytes
+}
+
+
+inline void keep_window_open()
+{
+	cin.clear();
+	cout << "Please enter a character to exit\n";
+	char ch;
+	cin >> ch;
+	return;
+}
+
+inline void keep_window_open(string s)
+{
+	if (s=="") return;
+	cin.clear();
+	cin.ignore(120,'\n');
+	for (;;) {
+		cout << "Please enter " << s << " to exit\n";
+		string ss;
+		while (cin >> ss && ss!=s)
+			cout << "Please enter " << s << " to exit\n";
+		return;
+	}
+}
+
+
+
+// error function to be used (only) until error() is introduced in Chapter 5:
+inline void simple_error(string s)	// write ``error: s’’ and exit program
+{
+	cerr << "error: " << s << '\n';
+	keep_window_open();		// for some Windows environments
+	exit(1);
+}
+
+// make std::min() and std::max() accessible:
+#undef min
+#undef max
+
+#include<iomanip>
+inline ios_base& general(ios_base& b)	// to augment fixed and scientific
+{
+	b.setf(ios_base::fmtflags(0),ios_base::floatfield);
+	return b;
+}
+
+// run-time checked narrowing cast (type conversion):
+template<class R, class A> R narrow_cast(const A& a)
+{
+	R r = R(a);
+	if (A(r)!=a) error(string("info loss"));
+	return r;
+}
+
+
+inline int randint(int max) { return rand()%max; }
+
+inline int randint(int min, int max) { return randint(max-min)+min; }
+
+inline double sqrt(int x) { return sqrt(double(x)); }	// to match C++0x
+
+#endif

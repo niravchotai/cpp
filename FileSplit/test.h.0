@@ -1,0 +1,76 @@
+/*
+	This provides the most common standard headers (in the global namespace)
+	and minimal exception/error support.
+
+	Please don't try to understand the details of headers just yet.
+	This header is primarily used so that you don't have
+	to understand every concept all at once.	
+*/
+
+#ifndef H112
+#define H112 201004L
+
+#include<iostream>
+#include<fstream>
+#include<sstream>
+#include<cmath>
+#include<cstdlib>
+#include<string>
+#include<list>
+#include<vector>
+#include<algorithm>
+#include<stdexcept>
+
+//------------------------------------------------------------------------------
+
+#ifdef _MSC_VER
+#include <hash_map>
+using stdext::hash_map;
+#else
+#include <ext/hash_map>
+using __gnu_cxx::hash_map;
+
+namespace __gnu_cxx {
+
+    template<> struct hash<std::string>
+    {
+        size_t operator()(const std::string& s) const
+        {
+            return hash<char*>()(s.c_str());
+        }
+    };
+
+} // of namespace __gnu_cxx
+#endif
+
+//------------------------------------------------------------------------------
+
+#define unordered_map hash_map
+
+//------------------------------------------------------------------------------
+
+typedef long Unicode;
+
+//------------------------------------------------------------------------------
+
+using namespace std;
+
+template<class T> string to_string(const T& t)
+{
+	ostringstream os;
+	os << t;
+	return os.str();
+}
+
+struct Range_error : out_of_range {	// enhanced vector range error reporting
+	int index;
+	Range_error(int i) :out_of_range("Range error: "+to_string(i)), index(i) { }
+};
+
+
+// trivially range-checked vector (no iterator checking):
+template< class T> struct Vector : public std::vector<T> {
+	typedef typename std::vector<T>::size_type size_type;
+
+	Vector() { }
+	explicit Vector(size_type n) :std::vector
